@@ -31,7 +31,7 @@ My Polyglot é um aplicativo web que utiliza a tecnologia de IA do Google para a
 1. **Clone o repositório:**
 
 ```bash
-git clone https://github.com/claudiocmm/My_Polyglot_App
+git clone https://github.com/claudiocmm/My_Polyglot_app.git
 ```
 
 2. **Instale as dependências:**
