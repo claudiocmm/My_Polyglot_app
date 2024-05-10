@@ -6,6 +6,14 @@ import settings
 import os
 
 API_KEY = 'COLOQUE SUA API KEY AQUI'
+#se nao estiver utilizando uma apikey valida utiliza o secret do stremlit do deploy
+#faco um tratamento de error para poder testar localmente
+if API_KEY=='COLOQUE SUA API KEY AQUI':
+    try:
+        API_KEY=st.secrets["API_KEY"]
+    except KeyError:
+        print("error")
+
 genai.configure(api_key=API_KEY)
 
 #removendo os arquivos iniciai
@@ -146,6 +154,8 @@ def main():
     st.header("My Polyglot 🌎", divider=True)
 
     with st.sidebar:
+
+        st.image("images_app/logo_my_polyglot_app.png")
 
         st.markdown("""
         ## Bem vindo ao *My Polyglot*.
