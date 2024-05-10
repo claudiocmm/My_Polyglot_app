@@ -155,7 +155,7 @@ def main():
 
     with st.sidebar:
 
-        st.image("images_app/logo_my_polyglot_app.png")
+        st.image("./images_app/logo_my_polyglot_app.png")
 
         st.markdown("""
         ## Bem vindo ao *My Polyglot*.
