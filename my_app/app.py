@@ -11,10 +11,11 @@ API_KEY = 'COLOQUE SUA API KEY AQUI'
 genai.configure(api_key=API_KEY)
 
 #removendo os arquivos iniciai
-list_files_to_remove = ["pronunciation_audio.mp3","text_converted_to_audio.mp3"]
-for file_path in list_files_to_remove:
-    if os.path.exists(file_path):
-        os.remove(file_path)
+def remove_files():
+    list_files_to_remove = ["my_app/pronunciation_audio.mp3","my_app/text_converted_to_audio.mp3"]
+    for file_path in list_files_to_remove:
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
 
 def generate_random_phrase(language_and_accent:str):
@@ -61,14 +62,14 @@ def transcribe_audio_to_text(speech_file_path: str, language_and_accent:str, ran
     convo = model.start_chat(history=[
     {
         "role": "user",
-        "parts": [genai.upload_file("few_shot_pronunciation_error.mp3")]
+        "parts": [genai.upload_file("my_app/few_shot_pronunciation_error.mp3")]
     },
     {
         "role": "user",
-    	"parts": [f"""question: Considerando o audio como "I saw a bird in his nest", procure problemas de pronuncia em English e ajude o usuário a entender os erros.
+    	"parts": [f"""question: Considerando o audio como "I saw a bird in his nest", avalie se a pronúncia  em {language_treated} está correta ou errada.
                        Siga os seguintes requerimentos:
-                       - Transcreva os textos que estão com entonação diferente da requisitada e explique o por quê.
-                       - Foque em erros de pronúncia das palavras.
+                       - Transcreva os textos que estão com pronúncias erradas e explique o por quê.
+                       - Analise somente as pronúncias das palavras na frase.
 
                        Me envie com a seguinte estrutura:
                        Avaliação da pronúncia em inglês:
@@ -78,15 +79,34 @@ def transcribe_audio_to_text(speech_file_path: str, language_and_accent:str, ran
         "role": "model",
         "parts": ["## Avaliação da pronúncia em inglês:\n\n**Trecho com erro:** \"a bird\".\n\n**Justificativa do erro:** A pronúncia de \"bird\" está incorreta. O usuário pronunciou a palavra como \"beard\", que soa como a palavra inglesa para barba. A pronúncia correta de \"bird\" soa como \"bərd\", com o som de \"e\" mais curto, como em \"bed\". \n\nPratique a diferença entre vogais curtas e longas em inglês. Isso pode ser feito através de exercícios de repetição e escuta de falantes nativos pronunciando as palavras corretamente."]   
     },
+        {
+        "role": "user",
+        "parts": [genai.upload_file("my_app/few_shot_pronunciation_correct.mp3")]
+    },
+    {
+        "role": "user",
+    	"parts": [f"""question: Considerando o audio como "The quick brown fox jumps over the lazy dog.", avalie se a pronúncia  em {language_treated} está correta ou errada.
+                       Siga os seguintes requerimentos:
+                       - Transcreva os textos que estão com pronúncias erradas e explique o por quê.
+                       - Analise somente as pronúncias das palavras na frase.
+
+                       Me envie com a seguinte estrutura:
+                       Avaliação da pronúncia em inglês:
+                       trecho com erro: justificativa do erro"""]
+    },
+    {
+        "role": "model",
+        "parts": ["## Avaliação da pronúncia em inglês:\n\nA pronúncia da frase está correta, todas as palavras foram faladas no aúdio com uma boa pronúncia.\n\n"]   
+    },
     {
         "role": "user",
         "parts": [genai.upload_file(speech_file_path)]
     }])
     
-    convo.send_message(f"""question: Considerando o audio como "{random_phrase_to_check_pronunciation}", procure problemas de pronuncia em {language_treated} e ajude o usuário a entender os erros.
+    convo.send_message(f"""question: Considerando o audio como "{random_phrase_to_check_pronunciation}", avalie se a pronúncia  em {language_treated} está correta ou errada.
                        Siga os seguintes requerimentos:
-                       - Transcreva os textos que estão com entonação diferente da requisitada e explique o por quê.
-                       - Foque em erros de pronúncia das palavras.
+                       - Transcreva os textos que estão com pronúncias erradas e explique o por quê.
+                       - Analise somente as pronúncias das palavras na frase.
 
                        Me envie com a seguinte estrutura:
                        Avaliação da pronúncia em inglês:
@@ -169,7 +189,7 @@ def convert_text_to_audio(text_to_read_voice: str, language_text:str, language:s
     response = convo.last.text
     print(response)
 
-    file_text_converted_to_audio = "text_converted_to_audio.mp3"
+    file_text_converted_to_audio = "my_app/text_converted_to_audio.mp3"
     my_text_converted_to_audio = gTTS(text=response, lang=language, tld=accent, slow=False)
     my_text_converted_to_audio.save(file_text_converted_to_audio)
 
@@ -200,6 +220,9 @@ def main():
             * Receba feedback sobre sua pronúncia, identificando erros e sugerindo pontos de melhoria.
             * Acesse links de estudo direcionados para aperfeiçoar sua pronúncia.
     """)
+    
+    #removendo arquivos remanescentes
+    remove_files()
 
     option_language = st.selectbox("Qual língua você deseja aperfeiçoar?", tuple(set([x.split(" - ")[0] for x in settings.dict_languages.keys()])))
 
@@ -235,7 +258,6 @@ def main():
     with tab_pronuncia:
         recorded_audio=None
         st.subheader("Vamos checar se sua pronúncia está boa?")
-
         generate_phrase_bt = st.button("Gere uma Frase")
     
         #Initialize session state
@@ -245,20 +267,24 @@ def main():
         recorded_audio = audio_recorder(pause_threshold=10000)
 
         if generate_phrase_bt:
+            #removendo arquivos remanescentes
+            remove_files()
+            recorded_audio = None
             st.session_state.generate_phrase_state = generate_random_phrase(language_and_accent=option_language)
         
             st.write("Clique no microfone para mandar um audio falando a seguinte frase: \n" + "* " + st.session_state.generate_phrase_state)
 
-
         if recorded_audio:
-            st.write("Clique no microfone para mandar um audio falando a seguinte frase: \n" + "* " + st.session_state.generate_phrase_state)
-            audio_file="pronunciation_audio.mp3"
+            if generate_phrase_bt==False:
+                st.write("Clique no microfone para mandar um audio falando a seguinte frase: \n" + "* " + st.session_state.generate_phrase_state)
+            audio_file="my_app/pronunciation_audio.mp3"
             with open(audio_file, "wb") as f:
                 f.write(recorded_audio)
             text = transcribe_audio_to_text(speech_file_path = audio_file, language_and_accent = option_language, random_phrase_to_check_pronunciation = st.session_state.generate_phrase_state)
             st.audio(audio_file, format="audio/mpeg")
             st.divider()
             st.write(text)
+            generate_phrase_bt = None
 
 if __name__== "__main__":
     main()
