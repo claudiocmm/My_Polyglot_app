@@ -1,5 +1,7 @@
 # My Polyglot: Aprenda Idiomas com a Ajuda da IA
-<img src="my_app/logo_my_polyglot_app.png" width="600px"/>
+<div align="center">
+    <img src="my_app/logo_my_polyglot_app.png" width="600px"/>
+</div>
 
 ## Sobre o Projeto
 **My Polyglot** é um aplicativo web que utiliza a tecnologia de IA do Google para auxiliar no aprendizado de idiomas. Com ele, você pode praticar suas habilidades de escrita, escuta e pronúncia de forma autônoma e personalizada.
