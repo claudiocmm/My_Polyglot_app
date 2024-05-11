@@ -13,6 +13,7 @@ Este código Python utiliza a biblioteca `streamlit` para criar uma aplicação 
 * **Remoção de arquivos:** Elimina arquivos de áudio existentes para evitar conflitos.
 
 * **Funções:**
+    * **`generate_random_phrase`:** Recebe o idioma desejado e gera uma curta frase usando o Gemini para ser utilizada no check de pronúncia.
     * **`transcribe_audio_to_text`:** Recebe um arquivo de áudio e o idioma/sotaque, transcreve o áudio em texto usando o Gemini e realiza uma avaliação da pronúncia, identificando erros e sugerindo recursos de estudo.
     * **`fix_writing`:** Recebe um texto e o idioma/sotaque, corrige erros gramaticais e explica as alterações realizadas, considerando a gramática do idioma escolhido.
     * **`convert_text_to_audio`:** Recebe um texto, o idioma de origem e o idioma/sotaque desejado, traduz o texto usando o Gemini e converte o texto traduzido em áudio utilizando o gTTS.

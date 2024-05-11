@@ -17,8 +17,28 @@ for file_path in list_files_to_remove:
         os.remove(file_path)
 
 
+def generate_random_phrase(language_and_accent:str):
+    generation_config = {
+    "temperature": 1,
+    "top_p": 1,
+    "top_k": 0,
+    "max_output_tokens": 2048,
+    }
+    model = genai.GenerativeModel(model_name="gemini-1.0-pro",
+                              generation_config=generation_config,
+                              safety_settings=settings.safety_settings)
 
-def transcribe_audio_to_text(speech_file_path: str, language_and_accent:str):
+    language_treated = language_and_accent.split("-")[0] #pegando somente a lingua
+
+
+    convo = model.start_chat(history=[])
+    convo.send_message(f"""Gere uma frase curta aleatória em {language_treated}. Me envie SOMENTE a frase.""")
+    response = convo.last.text
+
+    return response
+
+
+def transcribe_audio_to_text(speech_file_path: str, language_and_accent:str, random_phrase_to_check_pronunciation:str):
     ####
     # FUNCAO PARA CONVERTER AUDIO EM TEXTO E FAZER A AVALIACAO
     ####
@@ -37,6 +57,7 @@ def transcribe_audio_to_text(speech_file_path: str, language_and_accent:str):
 
     language_treated = language_and_accent.split("-")[0] #pegando somente a lingua
 
+
     convo = model.start_chat(history=[
     {
         "role": "user",
@@ -44,7 +65,7 @@ def transcribe_audio_to_text(speech_file_path: str, language_and_accent:str):
     },
     {
         "role": "user",
-    	"parts": [f"""question: Considerando o audio enviado, procure problemas de pronuncia em English e ajude o usuário a entender os erros.
+    	"parts": [f"""question: Considerando o audio como "I saw a bird in his nest", procure problemas de pronuncia em English e ajude o usuário a entender os erros.
                        Siga os seguintes requerimentos:
                        - Transcreva os textos que estão com entonação diferente da requisitada e explique o por quê.
                        - Foque em erros de pronúncia das palavras.
@@ -62,7 +83,7 @@ def transcribe_audio_to_text(speech_file_path: str, language_and_accent:str):
         "parts": [genai.upload_file(speech_file_path)]
     }])
     
-    convo.send_message(f"""question: Considerando o audio enviado, procure problemas de pronuncia em {language_treated} e ajude o usuário a entender os erros.
+    convo.send_message(f"""question: Considerando o audio como "{random_phrase_to_check_pronunciation}", procure problemas de pronuncia em {language_treated} e ajude o usuário a entender os erros.
                        Siga os seguintes requerimentos:
                        - Transcreva os textos que estão com entonação diferente da requisitada e explique o por quê.
                        - Foque em erros de pronúncia das palavras.
@@ -161,7 +182,7 @@ def main():
 
     with st.sidebar:
 
-        st.image("logo_my_polyglot_app.png")
+        st.image("my_app/logo_my_polyglot_app.png")
 
         st.markdown("""
         ## Bem vindo ao *My Polyglot*.
@@ -210,15 +231,31 @@ def main():
             st.markdown(response)
             st.audio(file_text_converted_to_audio, format="audio/mpeg")
 
+
     with tab_pronuncia:
         recorded_audio=None
-        st.subheader("Vamos checar se sua pronúncia está boa?\nClique no microfone para gravar um audio e veja a análise do Polyglot sobre a sua pronúncia.")
+        st.subheader("Vamos checar se sua pronúncia está boa?")
+
+        generate_phrase_bt = st.button("Gere uma Frase")
+    
+        #Initialize session state
+        if "generate_phrase_state" not in st.session_state:
+            st.session_state.generate_phrase_state = ""
+
         recorded_audio = audio_recorder(pause_threshold=10000)
+
+        if generate_phrase_bt:
+            st.session_state.generate_phrase_state = generate_random_phrase(language_and_accent=option_language)
+        
+            st.write("Clique no microfone para mandar um audio falando a seguinte frase: \n" + "* " + st.session_state.generate_phrase_state)
+
+
         if recorded_audio:
+            st.write("Clique no microfone para mandar um audio falando a seguinte frase: \n" + "* " + st.session_state.generate_phrase_state)
             audio_file="pronunciation_audio.mp3"
             with open(audio_file, "wb") as f:
                 f.write(recorded_audio)
-            text = transcribe_audio_to_text(speech_file_path = audio_file, language_and_accent = option_language)
+            text = transcribe_audio_to_text(speech_file_path = audio_file, language_and_accent = option_language, random_phrase_to_check_pronunciation = st.session_state.generate_phrase_state)
             st.audio(audio_file, format="audio/mpeg")
             st.divider()
             st.write(text)

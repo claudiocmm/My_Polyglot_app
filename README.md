@@ -5,6 +5,7 @@
 
 ## Sobre o Projeto
 **My Polyglot** é um aplicativo web que utiliza a tecnologia de IA do Google para auxiliar no aprendizado de idiomas. Com ele, você pode praticar suas habilidades de escrita, escuta e pronúncia de forma autônoma e personalizada.
+Atualmente com suporte para Inglês, Mandarim e Espanhol
 
 ## Recursos
 
@@ -41,7 +42,7 @@ git clone https://github.com/claudiocmm/My_Polyglot_app.git
 2. **Instale as dependências:**
 
 ```bash
-pip install -r requirements.txt
+pip install -r my_app/requirements.txt
 ```
 
 3. **Configure sua chave de API:**
@@ -51,7 +52,7 @@ pip install -r requirements.txt
 4. **Execute o aplicativo:**
 
 ```bash
-streamlit run app.py
+streamlit run my_app/app.py
 ```
 
 5. **Acesse o aplicativo:** Abra seu navegador web e acesse o endereço `http://localhost:8501`.
