@@ -7,7 +7,6 @@ import os
 
 API_KEY = 'COLOQUE SUA API KEY AQUI'
 
-
 genai.configure(api_key=API_KEY)
 
 #removendo os arquivos iniciai
@@ -187,7 +186,7 @@ def convert_text_to_audio(text_to_read_voice: str, language_text:str, language:s
                        Traduza o texto para {language_text}.\n
                        texto: {text_to_read_voice}""")
     response = convo.last.text
-    print(response)
+    # print(response)
 
     file_text_converted_to_audio = "my_app/text_converted_to_audio.mp3"
     my_text_converted_to_audio = gTTS(text=response, lang=language, tld=accent, slow=False)
