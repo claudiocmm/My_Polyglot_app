@@ -5,7 +5,8 @@ from gtts import gTTS
 import settings
 import os
 
-API_KEY = 'COLOQUE SUA API KEY AQUI'
+# API_KEY = 'COLOQUE SUA API KEY AQUI'
+API_KEY = 'AIzaSyDpsqYhjnMNYIKwvAYdU1rp-n37ynz1UwY'
 #se nao estiver utilizando uma apikey valida utiliza o secret do stremlit do deploy
 #faco um tratamento de error para poder testar localmente
 if API_KEY=='COLOQUE SUA API KEY AQUI':
@@ -35,7 +36,7 @@ def transcribe_audio_to_text(speech_file_path: str, language_and_accent:str):
     "top_k": 0,
     "max_output_tokens": 2048,
     }
-    system_instruction = "Voce é uma ferramenta focada em línguas, sua principal função é traduzir e corrigir textos em diversas linguas diferentes"
+    system_instruction = "Voce é uma ferramenta focada em línguas, sua principal função avaliar a pronuncia de audios em diversas linguas diferentes"
     model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
                               generation_config=generation_config,
                               system_instruction=system_instruction,
@@ -43,23 +44,39 @@ def transcribe_audio_to_text(speech_file_path: str, language_and_accent:str):
 
     language_treated = language_and_accent.split("-")[0] #pegando somente a lingua
 
-    convo = model.start_chat(history=[{
+    convo = model.start_chat(history=[
+    {
+        "role": "user",
+        "parts": [genai.upload_file("few_shot_pronunciation_error.mp3")]
+    },
+    {
+        "role": "user",
+    	"parts": [f"""question: Considerando o audio enviado, procure problemas de pronuncia em English e ajude o usuário a entender os erros.
+                       Siga os seguintes requerimentos:
+                       - Transcreva os textos que estão com entonação diferente da requisitada e explique o por quê.
+                       - Foque em erros de pronúncia das palavras.
+
+                       Me envie com a seguinte estrutura:
+                       Avaliação da pronúncia em inglês:
+                       trecho com erro: justificativa do erro"""]
+    },
+    {
+        "role": "model",
+        "parts": ["## Avaliação da pronúncia em inglês:\n\n**Trecho com erro:** \"a bird\".\n\n**Justificativa do erro:** A pronúncia de \"bird\" está incorreta. O usuário pronunciou a palavra como \"beard\", que soa como a palavra inglesa para barba. A pronúncia correta de \"bird\" soa como \"bərd\", com o som de \"e\" mais curto, como em \"bed\". \n\nPratique a diferença entre vogais curtas e longas em inglês. Isso pode ser feito através de exercícios de repetição e escuta de falantes nativos pronunciando as palavras corretamente."]   
+    },
+    {
         "role": "user",
         "parts": [genai.upload_file(speech_file_path)]
     }])
     
-    convo.send_message(f"""Você é uma ferramenta especialista em linguas e precisa responder ao usuário de forma didática.
-                       Considerando o audio enviado, faça uma avaliação da pronúncia em {language_treated}.
+    convo.send_message(f"""question: Considerando o audio enviado, procure problemas de pronuncia em {language_treated} e ajude o usuário a entender os erros.
                        Siga os seguintes requerimentos:
                        - Transcreva os textos que estão com entonação diferente da requisitada e explique o por quê.
-                       - No final, sugira links de estudo focados para os erros encontrados.
+                       - Foque em erros de pronúncia das palavras.
 
                        Me envie com a seguinte estrutura:
                        Avaliação da pronúncia em inglês:
-                       Problemas identificados:
-                       trecho com erro: justificativa do erro
-                       
-                       sugestões de estudo:""")
+                       trecho com erro: justificativa do erro""")
     response = convo.last.text
     return response
 
@@ -70,15 +87,13 @@ def fix_writing(text_to_check: str, language_and_accent:str):
     # FUNCAO AJUSTAR TEXTOS ESCRITOS E TRADUZI-LOS
     ####
     generation_config = {
-    "temperature": 1,
+    "temperature": 0.2,
     "top_p": 1,
     "top_k": 0,
     "max_output_tokens": 8048,
     }
-    system_instruction = "Voce é uma ferramenta focada em línguas, sua principal função é traduzir e corrigir textos em diversas linguas diferentes"
-    model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
+    model = genai.GenerativeModel(model_name="gemini-1.0-pro",
                               generation_config=generation_config,
-                              system_instruction=system_instruction,
                               safety_settings=settings.safety_settings)
 
     language_treated = language_and_accent.split("-")[0] #pegando somente a lingua
@@ -86,17 +101,17 @@ def fix_writing(text_to_check: str, language_and_accent:str):
     convo = model.start_chat(history=[
                     {
                     "role": "user",
-                    "parts": ["""Corrija os erros gramaticais de {language_treated} no texto enviado e explique cada ajuste.\n
+                    "parts": ["""Voce é uma ferramenta focada em línguas, sua principal função é traduzir e corrigir textos em diversas linguas diferentes. Corrija os erros gramaticais de {language_treated} no texto enviado e explique cada ajuste.\n
                        texto: My name are Claudio"""]
                     },
                     {
                     "role": "model",
-                    "parts": ["The error in the sentence \"My name are Claudio\" is a subject-verb agreement issue.  \n\n*   **\"My name\"** is a singular noun, so it requires a singular verb. \n*   **\"Are\"** is a plural verb, and it should be replaced with the singular verb **\"is\"**.\n\nThe correct sentence should be: **\"My name is Claudio\"**"]
+                    "parts": ["O erro na sentença \"My name are Claudio\" é uma questão de concordância sujeito-verbo.  \n\n*   **\"My name\"** é um substantivo singular, portanto requer um verbo singular. \n*   **\"Are\"** é um verbo plural e deve ser substituído pelo verbo singular **\"is\"**.\n\nA frase correta deve ser: **\"My name is Claudio\"**"]
                     },
                     ]
                             )
     
-    convo.send_message(f"""Corrija os erros gramaticais de {language_treated} no texto enviado e explique cada ajuste.\n
+    convo.send_message(f"""Voce é uma ferramenta focada em línguas, sua principal função é traduzir e corrigir textos em diversas linguas diferentes. Corrija os erros gramaticais de {language_treated} no texto enviado e explique cada ajuste.\n
                        texto: {text_to_check}""")
     response = convo.last.text
     # print(response)
@@ -111,15 +126,13 @@ def convert_text_to_audio(text_to_read_voice: str, language_text:str, language:s
     ####
 
     generation_config = {
-    "temperature": 1,
+    "temperature": 0.2,
     "top_p": 1,
     "top_k": 0,
     "max_output_tokens": 8048,
     }
-    system_instruction = "Voce é uma ferramenta focada em línguas, sua principal função é traduzir e corrigir textos em diversas linguas diferentes"
-    model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
+    model = genai.GenerativeModel(model_name="gemini-1.0-pro",
                               generation_config=generation_config,
-                              system_instruction=system_instruction,
                               safety_settings=settings.safety_settings)
 
 
@@ -127,11 +140,11 @@ def convert_text_to_audio(text_to_read_voice: str, language_text:str, language:s
     convo = model.start_chat(history=[
                     {
                     "role": "user",
-                    "parts": ["Você é uma ferramenta especialista em linguas e precisa responder ao usuário de forma didática.\n Traduza o texto para English.\n texto: Meu amigo é legal"]
+                    "parts": ["Você é uma ferramenta especialista em linguas e precisa responder ao usuário de forma didática.\n Traduza o texto para English.\n texto: Meu amigo é legal, gosto muito de sair com ele para as festas"]
                     },
                     {
                         "role": "model",
-                        "parts": ["My friend is cool."]
+                        "parts": ["My friend is cool, I like so much to hang out with him to parties"]
                     }
                     ]
                             )
@@ -213,6 +226,7 @@ def main():
             with open(audio_file, "wb") as f:
                 f.write(recorded_audio)
             text = transcribe_audio_to_text(speech_file_path = audio_file, language_and_accent = option_language)
+            st.audio(audio_file, format="audio/mpeg")
             st.divider()
             st.write(text)
 

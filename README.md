@@ -1,28 +1,30 @@
 # My Polyglot: Aprenda Idiomas com a Ajuda da IA
+![](my_app/logo_my_polyglot_app.png)
 
 ## Sobre o Projeto
-
-My Polyglot é um aplicativo web que utiliza a tecnologia de IA do Google para auxiliar no aprendizado de idiomas. Com ele, você pode praticar suas habilidades de escrita, escuta e pronúncia de forma autônoma e personalizada.
-
-![Imagem do meu projeto](images/my_polyglot_app.png)
+**My Polyglot** é um aplicativo web que utiliza a tecnologia de IA do Google para auxiliar no aprendizado de idiomas. Com ele, você pode praticar suas habilidades de escrita, escuta e pronúncia de forma autônoma e personalizada.
 
 ## Recursos
 
 * **Escrita:**
     * Insira um texto e receba correções gramaticais com explicações detalhadas.
     * Aprenda com seus erros e melhore sua escrita no idioma escolhido.
+    ![Imagem do meu projeto](images_readme/escrita_my_polyglot_app.png)
 * **Escuta:**
     * Digite um texto em seu idioma nativo e ouça a tradução falada no idioma e sotaque que você deseja aprender.
     * Familiarize-se com a pronúncia correta e a entonação natural do idioma.
+    ![Imagem do meu projeto](images_readme/escuta_my_polyglot_app.png)
 * **Pronúncia:**
     * Grave sua voz falando no idioma que está aprendendo.
     * Receba feedback sobre sua pronúncia, identificando erros e sugerindo pontos de melhoria.
     * Acesse links de estudo direcionados para aperfeiçoar sua pronúncia.
+    ![Imagem do meu projeto](images_readme/pronuncia_my_polyglot_app.png)
 
 ## Tecnologias Utilizadas
 
 * **Streamlit:** Framework Python para criação de aplicativos web de forma rápida e fácil.
 * **Google Generative AI (Gemini):** Modelo de linguagem avançado que potencializa as funcionalidades de processamento de linguagem do aplicativo.
+* **Técnicas de Prompt Engineering:** Foram utilizadas técnicas de few-shot learning e ajustes nos parâmetros de temperatura do LLM.
 * **gTTS:** Biblioteca Python para conversão de texto em fala.
 * **audio_recorder_streamlit:** Componente Streamlit para gravação de áudio diretamente no navegador.
 
