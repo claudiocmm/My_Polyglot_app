@@ -5,15 +5,8 @@ from gtts import gTTS
 import settings
 import os
 
-# API_KEY = 'COLOQUE SUA API KEY AQUI'
-API_KEY = 'AIzaSyDpsqYhjnMNYIKwvAYdU1rp-n37ynz1UwY'
-#se nao estiver utilizando uma apikey valida utiliza o secret do stremlit do deploy
-#faco um tratamento de error para poder testar localmente
-if API_KEY=='COLOQUE SUA API KEY AQUI':
-    try:
-        API_KEY=st.secrets["API_KEY"]
-    except KeyError:
-        print("error")
+API_KEY = 'COLOQUE SUA API KEY AQUI'
+
 
 genai.configure(api_key=API_KEY)
 
