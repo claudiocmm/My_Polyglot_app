@@ -64,3 +64,6 @@ streamlit run my_app/app.py
 ## Contribuições
 
 Sinta-se à vontade para contribuir com o projeto! Você pode sugerir novos recursos, relatar bugs ou enviar pull requests com melhorias.
+
+## Contato
+[Linkedin](https://www.linkedin.com/in/claudio-césar-506961164/)
